@@ -59,6 +59,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
         width: node.offsetWidth,
         height: node.offsetHeight,
       }),
+      decorateHelper: (item) => item,
     };
 
     static propTypes = {
@@ -86,6 +87,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
       ]),
       getContainer: PropTypes.func,
       getHelperDimensions: PropTypes.func,
+      decorateHelper: PropTypes.func,
     };
 
     static childContextTypes = {
@@ -238,6 +240,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
           helperClass,
           hideSortableGhost,
           onSortStart,
+          decorateHelper,
           useWindowAsScrollContainer,
         } = this.props;
         const {node, collection} = active;
@@ -283,12 +286,12 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
         ]; // Convert NodeList to Array
 
         clonedFields.forEach((field, index) => {
-          if (field.type !== 'file' && fields[index]) {		
+          if (field.type !== 'file' && fields[index]) {
             field.value = fields[index].value;
           }
         });
 
-        this.helper = this.document.body.appendChild(clonedNode);
+        this.helper = decorateHelper(this.document.body.appendChild(clonedNode));
 
         this.helper.style.position = 'fixed';
         this.helper.style.top = `${this.boundingClientRect.top - margin.top}px`;
@@ -513,7 +516,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 
     updatePosition(e) {
       const {lockAxis, lockToContainerEdges} = this.props;
-      
+
       const offset = this.getOffset(e);
       const translate = {
         x: offset.x - this.initialOffset.x,
@@ -808,7 +811,8 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
             'lockOffset',
             'lockToContainerEdges',
             'getContainer',
-            'getHelperDimensions'
+            'getHelperDimensions',
+            'decorateHelper'
           )}
         />
       );
